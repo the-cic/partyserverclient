@@ -7,14 +7,13 @@ package com.mush.partyserver.rooms;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mush.partyserver.rooms.message.ClientMessage;
-import com.mush.partyserver.rooms.message.LoginMessage;
-import com.mush.partyserver.rooms.message.Message;
-import com.mush.partyserver.rooms.message.ServerMessage;
+import com.mush.partyserver.message.ClientMessage;
+import com.mush.partyserver.message.LoginMessage;
+import com.mush.partyserver.message.Message;
+import com.mush.partyserver.message.ServerMessage;
+import com.mush.partyserver.message.response.GuestResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.java_websocket.client.WebSocketClient;
@@ -46,13 +45,7 @@ public class RoomOwner extends WebSocketClient {
         }
     }
     
-    public void sendClientMessage(List<String> recipients, String action, String contentName, Object content) {
-        ClientMessage message = new ClientMessage();
-        message.recipients = recipients;
-        message.subject = ClientMessage.SUBJECT_COMMAND;
-        message.body = new HashMap<>();
-        message.body.put(ClientMessage.BODY_ACTION, action);
-        message.body.put(contentName, content);
+    public void sendClientMessage(ClientMessage message) {
         send(message);
     }
 
@@ -84,8 +77,11 @@ public class RoomOwner extends WebSocketClient {
                 case ServerMessage.SUBJECT_LOGIN_ACCEPTED:
                     delegate.onLogin();
                     break;
+                case ServerMessage.SUBJECT_USER_RESPONSE:
+                    delegate.onGuestResponse(GuestResponse.toGuestResponse(serverMessage));
+                    break;
                 default:
-                    delegate.onMessage(serverMessage);
+                    delegate.onServerMessage(serverMessage);
             }
         } catch (IOException ex) {
             delegate.onError(ex);

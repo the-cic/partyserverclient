@@ -3,15 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mush.partyserver.rooms.message;
+package com.mush.partyserver.message;
 
 /**
+ * Superclass for all messages, used just for inheritance
  *
  * @author cic
  */
-public class LoginMessage extends Message {
+public class Message {
 
-    public String login;
-
-    public String token;
 }

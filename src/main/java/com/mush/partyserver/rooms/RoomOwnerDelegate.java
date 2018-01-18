@@ -5,8 +5,9 @@
  */
 package com.mush.partyserver.rooms;
 
-import com.mush.partyserver.rooms.message.LoginMessage;
-import com.mush.partyserver.rooms.message.ServerMessage;
+import com.mush.partyserver.message.LoginMessage;
+import com.mush.partyserver.message.ServerMessage;
+import com.mush.partyserver.message.response.GuestResponse;
 
 /**
  *
@@ -39,6 +40,8 @@ public abstract class RoomOwnerDelegate {
 
     public abstract void onLogin();
 
-    public abstract void onMessage(ServerMessage serverMessage);
+    public abstract void onServerMessage(ServerMessage serverMessage);
+    
+    public abstract void onGuestResponse(GuestResponse guestResponse);
 
 }
