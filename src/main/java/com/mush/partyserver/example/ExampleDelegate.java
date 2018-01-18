@@ -53,9 +53,9 @@ public class ExampleDelegate extends RoomOwnerDelegate {
         guests = new Guests();
         assets = new AssetLibrary();
 
-        assets.addAsset("blob", Paths.get("src/main/resources/blob.jpg"));
-        assets.addAsset("box", Paths.get("src/main/resources/box.png"));
-        assets.addAsset("landscape", Paths.get("src/main/resources/landscape.jpg"));
+        assets.addAsset("blob", Paths.get("src/main/resources/blob.jpg"), 20);
+        assets.addAsset("box", Paths.get("src/main/resources/box.png"), 25);
+        assets.addAsset("landscape", Paths.get("src/main/resources/landscape.jpg"), 25);
     }
 
     public void connect() {

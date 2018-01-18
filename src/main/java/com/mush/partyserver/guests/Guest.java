@@ -14,19 +14,19 @@ import java.util.Set;
  * @author cic
  */
 public class Guest {
-    
+
     private final Set<String> sentAssets;
     private final String name;
-    
+
     public Guest(String name) {
         this.name = name;
         sentAssets = new HashSet<>();
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public StoreAssetsCommand getStoreMissingAssetsMessage(AssetLibrary library) {
         Set<String> missing = new HashSet<>();
         for (String assetName : library.getNames()) {
@@ -40,7 +40,7 @@ public class Guest {
         StoreAssetsCommand command = new StoreAssetsCommand();
         command.setRecipients(new String[]{this.name});
         for (String assetName : missing) {
-            command.addAsset(assetName, library.getAsset(assetName));
+            command.addAsset(assetName, library.getAsset(assetName).base64);
         }
         sentAssets.addAll(missing);
         return command;

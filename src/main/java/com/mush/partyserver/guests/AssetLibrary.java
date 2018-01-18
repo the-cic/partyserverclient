@@ -23,8 +23,8 @@ public class AssetLibrary {
 
     private static final String JPEG_PREFIX = "data:image/jpeg;base64,";
     private static final String PNG_PREFIX = "data:image/png;base64,";
-    
-    private final Map<String, String> assets;
+
+    private final Map<String, AssetDefinition> assets;
     private final Logger logger;
 
     public AssetLibrary() {
@@ -32,7 +32,7 @@ public class AssetLibrary {
         assets = new HashMap<>();
     }
 
-    public void addAsset(String name, Path path) {
+    public void addAsset(String name, Path path, int width) {
         if (assets.containsKey(name)) {
             return;
         }
@@ -40,17 +40,17 @@ public class AssetLibrary {
             logger.info("Loading asset {} from {}", name, path);
             String base64 = loadAsset(path);
             String prefix = getBase64Prefix(path);
-            assets.put(name, prefix + base64);
+            assets.put(name, new AssetDefinition(name, prefix + base64, width));
         } catch (IOException ex) {
             logger.error("Failed to load asset: {}", ex.getMessage());
         }
     }
-    
+
     public Set<String> getNames() {
         return assets.keySet();
     }
-    
-    public String getAsset(String name) {
+
+    public AssetDefinition getAsset(String name) {
         return assets.get(name);
     }
 
