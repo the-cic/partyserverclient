@@ -7,59 +7,35 @@ package com.mush.partyserver.example;
 
 import com.mush.partyserver.guests.AssetLibrary;
 import com.mush.partyserver.guests.Guest;
-import com.mush.partyserver.guests.Guests;
-import com.mush.partyserver.rooms.RoomOwner;
-import com.mush.partyserver.rooms.RoomOwnerDelegate;
 import com.mush.partyserver.message.command.ShowFormCommand;
 import com.mush.partyserver.message.command.StandByCommand;
 import com.mush.partyserver.message.command.StoreAssetsCommand;
 import com.mush.partyserver.message.ClientMessage;
-import com.mush.partyserver.message.ServerMessage;
 import com.mush.partyserver.message.command.ShowJoystickCommand;
 import com.mush.partyserver.message.response.FormResponse;
 import com.mush.partyserver.message.response.GuestResponse;
 import com.mush.partyserver.message.response.JoystickResponse;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.mush.partyserver.rooms.SimpleRoomOwnerDelegate;
 import java.nio.file.Paths;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author cic
  */
-public class ExampleDelegate extends RoomOwnerDelegate {
+public class ExampleDelegate extends SimpleRoomOwnerDelegate {
 
     private final static String NAME = "ExampleOwner";
     private final static String TOKEN = "405784574057349";
 
-    private final Logger logger;
-    private final RoomOwner client;
     private final AssetLibrary assets;
-    private final Guests guests;
 
     public ExampleDelegate(String host) {
-        super(NAME, TOKEN);
-        logger = LogManager.getLogger(this.getClass());
-
-        URI hostUri = null;
-        try {
-            hostUri = new URI(host);
-        } catch (URISyntaxException ex) {
-        }
-
-        client = new RoomOwner(hostUri, this);
-        guests = new Guests();
+        super(host, NAME, TOKEN);
         assets = new AssetLibrary();
 
         assets.addAsset("blob", Paths.get("src/main/resources/blob.jpg"), 20);
         assets.addAsset("box", Paths.get("src/main/resources/box.png"), 25);
         assets.addAsset("landscape", Paths.get("src/main/resources/landscape.jpg"), 25);
-    }
-
-    public void connect() {
-        client.connect();
     }
 
     @Override
@@ -88,26 +64,13 @@ public class ExampleDelegate extends RoomOwnerDelegate {
     }
 
     @Override
-    public void onServerMessage(ServerMessage serverMessage) {
-        try {
-            switch (serverMessage.subject) {
-                case ServerMessage.SUBJECT_ROOM_CREATED:
-                    logger.info("I has a room: {}", serverMessage.body.get(ServerMessage.BODY_ROOM_NAME));
-                    break;
-                case ServerMessage.SUBJECT_USER_CONNECTED: {
-                    String guestName = (String) serverMessage.body.get(ServerMessage.BODY_GUEST_NAME);
-                    Guest guest = guests.addGuest(guestName);
+    public void onGuestJoined(Guest guest) {
+        sendForm(guest);
+    }
 
-                    sendForm(guest);
-                }
-                break;
-                case ServerMessage.SUBJECT_USER_RESPONSE:
-                    logger.info(serverMessage.body);
-                    break;
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
+    @Override
+    public void onGuestLeft(Guest guest) {
+
     }
 
     @Override

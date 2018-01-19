@@ -25,8 +25,12 @@ public class Guests {
         guests.put(guestName, guest);
         return guest;
     }
-    
+
     public Guest getGuest(String guestName) {
         return guests.get(guestName);
+    }
+
+    public Guest removeGuest(String guestName) {
+        return guests.remove(guestName);
     }
 }
