@@ -28,6 +28,15 @@ public class ViewBox {
         sprites.clear();
         backgrounds.clear();
     }
+    
+    public void clearDirty() {
+        for (ViewBoxItem item : sprites.values()) {
+            item.clearDirty();
+        }
+        for (ViewBoxItem item : backgrounds.values()) {
+            item.clearDirty();
+        }
+    }
 
     public void addItem(ViewBoxItem item) {
         if (item.background) {
@@ -35,6 +44,14 @@ public class ViewBox {
         } else {
             sprites.put(item.id, item);
         }
+    }
+    
+    public void removeItem(ViewBoxItem item) {
+        if (item.background) {
+            backgrounds.remove(item.id);
+        } else {
+            sprites.remove(item.id);
+        }        
     }
 
     public ViewBoxItem getSprite(String id) {

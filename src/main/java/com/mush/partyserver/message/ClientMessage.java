@@ -7,8 +7,8 @@ package com.mush.partyserver.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Message sent to a list of guests
@@ -22,7 +22,7 @@ public class ClientMessage extends ContentMessage {
     public static final String BODY_ACTION = "action";
 
     @JsonProperty(value = "to")
-    public List<String> recipients;
+    public Collection<String> recipients;
 
     public ClientMessage(String action, String contentName, Object content) {
         this.subject = SUBJECT_COMMAND;
@@ -35,6 +35,10 @@ public class ClientMessage extends ContentMessage {
 
     public void setRecipients(String[] array) {
         recipients = Arrays.asList(array);
+    }
+    
+    public void setRecipients(Collection<String> names) {
+        this.recipients = names;
     }
 
     public void setRecipient(String name) {

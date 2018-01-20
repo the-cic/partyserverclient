@@ -5,9 +5,11 @@
  */
 package com.mush.partyserver.rooms;
 
+import com.mush.partyserver.guests.DefaultGuestFactory;
 import com.mush.partyserver.guests.Guest;
 import com.mush.partyserver.guests.Guests;
 import com.mush.partyserver.message.ServerMessage;
+import com.mush.partyserver.message.response.GuestResponse;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  *
- * @author Mirko Stancic, Dhimahi
+ * @author cic
  */
 public abstract class SimpleRoomOwnerDelegate extends RoomOwnerDelegate {
 
@@ -35,7 +37,7 @@ public abstract class SimpleRoomOwnerDelegate extends RoomOwnerDelegate {
         }
 
         client = new RoomOwner(hostUri, this);
-        guests = new Guests();
+        guests = new Guests(new DefaultGuestFactory());
     }
 
     public void connect() {
@@ -76,10 +78,10 @@ public abstract class SimpleRoomOwnerDelegate extends RoomOwnerDelegate {
 
     public abstract void onGuestLeft(Guest guest);
 
-//    @Override
-//    public void onGuestResponse(GuestResponse response) {
-//        logger.info(response.body);
-//        Guest guest = guests.getGuest(response.from);
-//    }
+    @Override
+    public void onGuestResponse(GuestResponse response) {
+        Guest guest = guests.getGuest(response.from);
+        guest.onGuestResponse(response);
+    }
 
 }

@@ -6,6 +6,7 @@
 package com.mush.partyserver.message.response;
 
 import com.mush.partyserver.message.ServerMessage;
+import java.util.List;
 
 /**
  *
@@ -13,11 +14,21 @@ import com.mush.partyserver.message.ServerMessage;
  */
 public class JoystickResponse extends GuestResponse {
 
-    public String joystickDirection = null;
+    public double directionX = 0;
+    public double directionY = 0;
 
     public JoystickResponse(ServerMessage message) {
         super(message);
-        joystickDirection = (String) body.get("joystick");
+        directionX = 0;
+        directionY = 0;
+        try {
+            List<Number> joystick = (List) body.get("joystick");
+            Number x = joystick.get(0);
+            Number y = joystick.get(1);
+            directionX = x != null ? x.doubleValue() : 0;
+            directionY = y != null ? y.doubleValue() : 0;
+        } catch (Exception e) {
+        }
     }
 
 }
