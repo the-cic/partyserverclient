@@ -14,11 +14,13 @@ public class AssetDefinition {
     public final String name;
     public final String base64;
     public final int width;
+    public final int height;
 
-    public AssetDefinition(String name, String base64, int width){
+    public AssetDefinition(String name, String base64, int width, int height){
         this.name = name;
         this.base64 = base64;
         this.width = width;
+        this.height = height;
     }
 
 }

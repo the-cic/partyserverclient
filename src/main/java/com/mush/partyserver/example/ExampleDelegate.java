@@ -5,6 +5,7 @@
  */
 package com.mush.partyserver.example;
 
+import com.mush.partyserver.guests.AssetDefinition;
 import com.mush.partyserver.guests.AssetLibrary;
 import com.mush.partyserver.guests.Guest;
 import com.mush.partyserver.guests.ViewBox;
@@ -39,9 +40,13 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
         assets = new AssetLibrary();
         viewBox = new ViewBox();
 
-        assets.addAsset("blob", Paths.get("src/main/resources/example/blob.jpg"), 20);
-        assets.addAsset("box", Paths.get("src/main/resources/example/box.png"), 25);
-        assets.addAsset("landscape", Paths.get("src/main/resources/example/landscape.jpg"), 25);
+        assets.addAsset("blob", Paths.get("src/main/resources/example/blob.jpg"), 20, 20);
+        assets.addAsset("box", Paths.get("src/main/resources/example/box.png"), 25, 25);
+        assets.addAsset("landscape", Paths.get("src/main/resources/example/landscape.jpg"), 25, 10);
+        
+        AssetDefinition bg = assets.getAsset("landscape");
+        
+        viewBox.setSize(bg.width, bg.height);
     }
 
     @Override
@@ -115,14 +120,15 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
         if (response instanceof JoystickResponse) {
             JoystickResponse joystick = (JoystickResponse) response;
             logger.info("joystick direction: {}, {}", joystick.directionX, joystick.directionY);
-            int x = guest.getIntegerProperty("x");
-            int y = guest.getIntegerProperty("y");
-            x += joystick.directionX;
-            y += joystick.directionY;
-            guest.setProperty("x", x);
-            guest.setProperty("y", y);
-            viewBox.getSprite("guest_" + guest.getName()).move(x, y);
+            double x = guest.getIntegerProperty("x");
+            double y = guest.getIntegerProperty("y");
+            x += joystick.directionX * viewBox.getXMoveFactor();
+            y += joystick.directionY * viewBox.getYMoveFactor();
+            guest.setProperty("x", (int)x);
+            guest.setProperty("y", (int)y);
+            viewBox.getSprite("guest_" + guest.getName()).move((int)x, (int)y);
             sendUpdateViewBoxToAll();
+            sendJoystick(guest);
         }
     }
 

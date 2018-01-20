@@ -18,17 +18,32 @@ public class ViewBox {
 
     private final Map<String, ViewBoxItem> sprites;
     private final Map<String, ViewBoxItem> backgrounds;
+    private double xMoveFactor;
+    private double yMoveFactor;
 
     public ViewBox() {
         sprites = new HashMap<>();
         backgrounds = new HashMap<>();
     }
 
+    public void setSize(int w, int h) {
+        xMoveFactor = 1;
+        yMoveFactor = w / h;
+    }
+
+    public double getXMoveFactor() {
+        return xMoveFactor;
+    }
+
+    public double getYMoveFactor() {
+        return yMoveFactor;
+    }
+
     public void clear() {
         sprites.clear();
         backgrounds.clear();
     }
-    
+
     public void clearDirty() {
         for (ViewBoxItem item : sprites.values()) {
             item.clearDirty();
@@ -45,13 +60,13 @@ public class ViewBox {
             sprites.put(item.id, item);
         }
     }
-    
+
     public void removeItem(ViewBoxItem item) {
         if (item.background) {
             backgrounds.remove(item.id);
         } else {
             sprites.remove(item.id);
-        }        
+        }
     }
 
     public ViewBoxItem getSprite(String id) {

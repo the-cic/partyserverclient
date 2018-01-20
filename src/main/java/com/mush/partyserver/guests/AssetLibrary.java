@@ -32,7 +32,7 @@ public class AssetLibrary {
         assets = new HashMap<>();
     }
 
-    public void addAsset(String name, Path path, int width) {
+    public void addAsset(String name, Path path, int width, int height) {
         if (assets.containsKey(name)) {
             return;
         }
@@ -40,7 +40,7 @@ public class AssetLibrary {
             logger.info("Loading asset {} from {}", name, path);
             String base64 = loadAsset(path);
             String prefix = getBase64Prefix(path);
-            assets.put(name, new AssetDefinition(name, prefix + base64, width));
+            assets.put(name, new AssetDefinition(name, prefix + base64, width, height));
         } catch (IOException ex) {
             logger.error("Failed to load asset: {}", ex.getMessage());
         }
