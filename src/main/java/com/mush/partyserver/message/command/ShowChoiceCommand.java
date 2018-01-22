@@ -15,31 +15,24 @@ import java.util.Map;
  *
  * @author cic
  */
-public class ShowFormCommand extends ClientMessage {
-
+public class ShowChoiceCommand extends ClientMessage {
+    
     private final Map<String, Object> content;
     private final List<Map<String, String>> fields;
-
-    public ShowFormCommand(String id, String title, String submit) {
-        super("showForm", "form", new HashMap<>());
-        content = (Map<String, Object>) this.body.get("form");
+    
+    public ShowChoiceCommand(String id, String title) {
+        super("showChoice", "choice", new HashMap<>());
+        content = (Map<String, Object>) this.body.get("choice");
         content.put("title", title);
         content.put("id", id);
-        content.put("submit", submit);
         fields = new ArrayList<>();
         content.put("fields", fields);
     }
-
-    private void addField(String type, String name, String label) {
+    
+    public void addChoice(String name, String label) {
         Map<String, String> field = new HashMap<>();
-        field.put("type", type);
         field.put("name", name);
         field.put("label", label);
-        fields.add(field);
+        fields.add(field);        
     }
-
-    public void addTextField(String name, String label) {
-        addField("text", name, label);
-    }
-
 }

@@ -29,6 +29,9 @@ public class GuestResponse extends ServerMessage {
                     case "form":
                         response = new FormResponse(message);
                         break;
+                    case "choice":
+                        response = new ChoiceResponse(message);
+                        break;
                     case "joystick":
                         response = new JoystickResponse(message);
                         break;

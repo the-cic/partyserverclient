@@ -14,9 +14,11 @@ import com.mush.partyserver.message.command.ShowFormCommand;
 import com.mush.partyserver.message.command.StandByCommand;
 import com.mush.partyserver.message.command.StoreAssetsCommand;
 import com.mush.partyserver.message.ClientMessage;
+import com.mush.partyserver.message.command.ShowChoiceCommand;
 import com.mush.partyserver.message.command.ShowJoystickCommand;
 import com.mush.partyserver.message.command.ShowViewBoxCommand;
 import com.mush.partyserver.message.command.UpdateViewBoxCommand;
+import com.mush.partyserver.message.response.ChoiceResponse;
 import com.mush.partyserver.message.response.FormResponse;
 import com.mush.partyserver.message.response.GuestResponse;
 import com.mush.partyserver.message.response.JoystickResponse;
@@ -43,9 +45,9 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
         assets.addAsset("blob", Paths.get("src/main/resources/example/blob.jpg"), 20, 20);
         assets.addAsset("box", Paths.get("src/main/resources/example/box.png"), 25, 25);
         assets.addAsset("landscape", Paths.get("src/main/resources/example/landscape.jpg"), 25, 10);
-        
+
         AssetDefinition bg = assets.getAsset("landscape");
-        
+
         viewBox.setSize(bg.width, bg.height);
     }
 
@@ -90,7 +92,7 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
         viewBox.addItem(sprite);
         guest.setProperty("x", x);
         guest.setProperty("y", y);
-        sendForm(guest);
+        sendChoice(guest);
         sendResetViewBoxToAll();
     }
 
@@ -106,16 +108,28 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
     public void onGuestResponse(GuestResponse response) {
         logger.info(response.body);
         Guest guest = guests.getGuest(response.from);
+        if (response instanceof ChoiceResponse) {
+            ChoiceResponse choice = (ChoiceResponse) response;
+            logger.info("choice: {}, {}", choice.choiceId, choice.value);
+            String selected = choice.value;
+            switch (selected) {
+                case "form":
+                    sendForm(guest);
+                    break;
+                case "viewBox":
+                    sendAssets(guest);
+                    sendShowViewBox(guest);
+                    sendJoystick(guest);
+                    break;
+                case "wait":
+                    sayHi(guest, null);
+                    break;
+            }
+        }
         if (response instanceof FormResponse) {
             FormResponse form = (FormResponse) response;
             logger.info("form: {}, {}", form.formId, form.values);
-            if ("start".equals(form.values.get("line1"))) {
-                sendAssets(guest);
-                sendShowViewBox(guest);
-                sendJoystick(guest);
-            } else {
-                sayHi(guests.getGuest(response.from));
-            }
+            sayHi(guest, form.values.get("line1"));
         }
         if (response instanceof JoystickResponse) {
             JoystickResponse joystick = (JoystickResponse) response;
@@ -124,16 +138,22 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
             double y = guest.getIntegerProperty("y");
             x += joystick.directionX * viewBox.getXMoveFactor();
             y += joystick.directionY * viewBox.getYMoveFactor();
-            guest.setProperty("x", (int)x);
-            guest.setProperty("y", (int)y);
-            viewBox.getSprite("guest_" + guest.getName()).move((int)x, (int)y);
+            guest.setProperty("x", (int) x);
+            guest.setProperty("y", (int) y);
+            ViewBoxItem sprite = viewBox.getSprite("guest_" + guest.getName());
+            sprite.move((int) x, (int) y);
+            sprite.setAsset(assets.getAsset(Math.random() > 0.5 ? "box" : "blob"));
             sendUpdateViewBoxToAll();
             sendJoystick(guest);
         }
     }
 
-    private void sayHi(Guest guest) {
-        ClientMessage message = new StandByCommand("Hello " + guest.getName() + ", plase wait now.");
+    private void sayHi(Guest guest, String text) {
+        String messageText = "Hello " + guest.getName() + ", plase wait now.";
+        if (text != null) {
+            messageText += " You typed: " + text;
+        }
+        ClientMessage message = new StandByCommand(messageText);
         message.setRecipient(guest.getName());
         client.sendClientMessage(message);
     }
@@ -160,22 +180,31 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
         client.sendClientMessage(showJoystick);
     }
 
-    private void sendForm(Guest guest) {
-        ShowFormCommand message = new ShowFormCommand("form1", "Type some things now");
+    private void sendChoice(Guest guest) {
+        ShowChoiceCommand message = new ShowChoiceCommand("choice1", "Choose now!");
         message.setRecipient(guest.getName());
-        message.addTextField("line1", "type \"start\"");
+        message.addChoice("viewBox", "view box example");
+        message.addChoice("form", "form example");
+        message.addChoice("wait", "wait example");
+        client.sendClientMessage(message);
+    }
+
+    private void sendForm(Guest guest) {
+        ShowFormCommand message = new ShowFormCommand("form1", "Type some things now", "Go!");
+        message.setRecipient(guest.getName());
+        message.addTextField("line1", "type \"view\" or \"choice\"");
         message.addTextField("line2", "and also this");
         message.addTextField("line3", "and this");
         client.sendClientMessage(message);
     }
-    
+
     private void sendResetViewBoxToAll() {
         ShowViewBoxCommand command = new ShowViewBoxCommand(true);
         viewBox.outputTo(command);
         command.setRecipients(guests.getGuestNamesWithProperty("view", true));
         client.sendClientMessage(command);
     }
-    
+
     private void sendUpdateViewBoxToAll() {
         UpdateViewBoxCommand command = new UpdateViewBoxCommand();
         viewBox.outputTo(command);
