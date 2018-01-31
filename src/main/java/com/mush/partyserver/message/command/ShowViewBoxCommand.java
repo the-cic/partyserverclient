@@ -26,25 +26,31 @@ public class ShowViewBoxCommand extends ClientMessage {
         }
         items = (List<Map<String, Object>>) body.get("items");
     }
-    
-    private Map<String, Object> addItem(String id, String shape) {
+
+    private Map<String, Object> addItem(String id, String contentName, String content) {
         Map<String, Object> item = new HashMap<>();
         item.put("id", id);
-        item.put("shape", shape);
+        item.put(contentName, content);
         items.add(item);
         return item;
     }
-    
+
     public void addBackgroundItem(String id, String shape) {
-        Map<String, Object> item = addItem(id, shape);
+        Map<String, Object> item = addItem(id, "shape", shape);
         item.put("background", Boolean.TRUE);
     }
-    
-    public void addSpriteItem(String id, String shape, int x, int y, int width) {
-        Map<String, Object> item = addItem(id, shape);
-        item.put("x", x);
-        item.put("y", y);
+
+    public void addSpriteItem(String id, String shape, double x, double y, double width) {
+        Map<String, Object> item = addItem(id, "shape", shape);
+        item.put("x", Math.round(x * 100.0) * 0.01);
+        item.put("y", Math.round(y * 100.0) * 0.01);
         item.put("width", width);
+    }
+
+    public void addLabelItem(String id, String text, double x, double y) {
+        Map<String, Object> item = addItem(id, "text", text);
+        item.put("x", Math.round(x * 100.0) * 0.01);
+        item.put("y", Math.round(y * 100.0) * 0.01);
     }
 
 }

@@ -41,6 +41,11 @@ public class Guest {
         return value instanceof Integer ? (Integer)value : null;
     }
     
+    public Double getDoubleProperty(String key) {
+        Object value = properties.get(key);
+        return value instanceof Double ? (Double)value : null;
+    }
+    
     public Boolean getBooleanProperty(String key) {
         Object value = properties.get(key);
         return value instanceof Boolean ? (Boolean)value : null;

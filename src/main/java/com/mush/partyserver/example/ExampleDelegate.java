@@ -68,6 +68,7 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
     @Override
     public void onError(Exception ex) {
         logger.info("on error: {}", ex.getMessage());
+        logger.info("on error", ex);
     }
 
     @Override
@@ -82,14 +83,19 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
 
     @Override
     public void onGuestJoined(Guest guest) {
-        int x = (int) (20 + Math.random() * 60);
-        int y = (int) (20 + Math.random() * 60);
+        double x = 20 + Math.random() * 60;
+        double y = 20 + Math.random() * 60;
         ViewBoxItem sprite = ViewBoxItem.createSprite(
                 "guest_" + guest.getName(),
                 assets.getAsset("box"),
                 x, y);
         sprite.scale(0.2f);
         viewBox.addItem(sprite);
+        ViewBoxItem label = ViewBoxItem.createLabel(
+                "label_" + guest.getName(),
+                guest.getName(),
+                x + sprite.width / 2, y - sprite.width / 5);
+        viewBox.addItem(label);
         guest.setProperty("x", x);
         guest.setProperty("y", y);
         sendChoice(guest);
@@ -101,6 +107,8 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
         guest.setProperty("view", false);
         ViewBoxItem sprite = viewBox.getSprite("guest_" + guest.getName());
         viewBox.removeItem(sprite);
+        ViewBoxItem label = viewBox.getLabel("label_" + guest.getName());
+        viewBox.removeItem(label);
         sendResetViewBoxToAll();
     }
 
@@ -134,15 +142,17 @@ public class ExampleDelegate extends SimpleRoomOwnerDelegate {
         if (response instanceof JoystickResponse) {
             JoystickResponse joystick = (JoystickResponse) response;
             logger.info("joystick direction: {}, {}", joystick.directionX, joystick.directionY);
-            double x = guest.getIntegerProperty("x");
-            double y = guest.getIntegerProperty("y");
+            double x = guest.getDoubleProperty("x");
+            double y = guest.getDoubleProperty("y");
             x += joystick.directionX * viewBox.getXMoveFactor();
             y += joystick.directionY * viewBox.getYMoveFactor();
-            guest.setProperty("x", (int) x);
-            guest.setProperty("y", (int) y);
+            guest.setProperty("x", x);
+            guest.setProperty("y", y);
             ViewBoxItem sprite = viewBox.getSprite("guest_" + guest.getName());
-            sprite.move((int) x, (int) y);
+            sprite.move(x, y);
             sprite.setAsset(assets.getAsset(Math.random() > 0.5 ? "box" : "blob"));
+            ViewBoxItem label = viewBox.getLabel("label_" + guest.getName());
+            label.move(x + sprite.width / 2, y - sprite.width / 5);
             sendUpdateViewBoxToAll();
             sendJoystick(guest);
         }

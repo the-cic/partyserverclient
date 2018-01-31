@@ -24,26 +24,33 @@ public class UpdateViewBoxCommand extends ClientMessage {
         items = (List<Map<String, Object>>) body.get("items");
     }
 
-    private Map<String, Object> addItem(String id, String shape) {
+    private Map<String, Object> addItem(String id, String contentName, String content) {
         Map<String, Object> item = new HashMap<>();
         item.put("id", id);
-        if (shape != null) {
-            item.put("shape", shape);
+        if (content != null) {
+            item.put(contentName, content);
         }
         items.add(item);
         return item;
     }
 
     public void addBackgroundItem(String id, String shape) {
-        addItem(id, shape);
+        addItem(id, "shape", shape);
     }
 
-    public void addSpriteItem(String id, String shape, int x, int y, Integer width) {
-        Map<String, Object> item = addItem(id, shape);
-        item.put("x", x);
-        item.put("y", y);
+    public void addSpriteItem(String id, String shape, double x, double y, Double width) {
+        Map<String, Object> item = addItem(id, "shape", shape);
+        item.put("x", Math.round(x * 100.0) * 0.01);
+        item.put("y", Math.round(y * 100.0) * 0.01);
         if (width != null) {
             item.put("width", width);
         }
     }
+    
+    public void addLabelItem(String id, String text, double x, double y) {
+        Map<String, Object> item = addItem(id, "text", text);
+        item.put("x", Math.round(x * 100.0) * 0.01);
+        item.put("y", Math.round(y * 100.0) * 0.01);
+    }
+    
 }

@@ -18,12 +18,14 @@ public class ViewBox {
 
     private final Map<String, ViewBoxItem> sprites;
     private final Map<String, ViewBoxItem> backgrounds;
+    private final Map<String, ViewBoxItem> labels;
     private double xMoveFactor;
     private double yMoveFactor;
 
     public ViewBox() {
         sprites = new HashMap<>();
         backgrounds = new HashMap<>();
+        labels = new HashMap<>();
     }
 
     public void setSize(int w, int h) {
@@ -54,18 +56,30 @@ public class ViewBox {
     }
 
     public void addItem(ViewBoxItem item) {
-        if (item.background) {
-            backgrounds.put(item.id, item);
-        } else {
-            sprites.put(item.id, item);
+        switch (item.type) {
+            case BACKGROUND:
+                backgrounds.put(item.id, item);
+                break;
+            case SPRITE:
+                sprites.put(item.id, item);
+                break;
+            case LABEL:
+                labels.put(item.id, item);
+                break;
         }
     }
 
     public void removeItem(ViewBoxItem item) {
-        if (item.background) {
-            backgrounds.remove(item.id);
-        } else {
-            sprites.remove(item.id);
+        switch (item.type) {
+            case BACKGROUND:
+                backgrounds.remove(item.id);
+                break;
+            case SPRITE:
+                sprites.remove(item.id);
+                break;
+            case LABEL:
+                labels.remove(item.id);
+                break;
         }
     }
 
@@ -77,11 +91,18 @@ public class ViewBox {
         return backgrounds.get(id);
     }
 
+    public ViewBoxItem getLabel(String id) {
+        return labels.get(id);
+    }
+
     public void outputTo(ShowViewBoxCommand command) {
         for (ViewBoxItem item : backgrounds.values()) {
             item.outputTo(command);
         }
         for (ViewBoxItem item : sprites.values()) {
+            item.outputTo(command);
+        }
+        for (ViewBoxItem item : labels.values()) {
             item.outputTo(command);
         }
     }
@@ -91,6 +112,9 @@ public class ViewBox {
             item.outputTo(command);
         }
         for (ViewBoxItem item : sprites.values()) {
+            item.outputTo(command);
+        }
+        for (ViewBoxItem item : labels.values()) {
             item.outputTo(command);
         }
     }

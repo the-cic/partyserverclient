@@ -14,16 +14,22 @@ import com.mush.partyserver.message.command.UpdateViewBoxCommand;
  */
 public class ViewBoxItem {
 
-    public final String id;
-    public final boolean background;
+    public enum ItemType {
+        SPRITE,
+        BACKGROUND,
+        LABEL
+    }
 
-    public String assetName;
+    public final String id;
+    public final ItemType type;
+
+    public String asset;
     private int assetWidth = 0;
     private float scale = 1;
 
-    public int x;
-    public int y;
-    public int width;
+    public double x;
+    public double y;
+    public double width;
 
     private boolean positionDirty;
     private boolean scaleDirty;
@@ -31,11 +37,17 @@ public class ViewBoxItem {
 
     private ViewBoxItem(String id, boolean background, AssetDefinition asset) {
         this.id = id;
-        this.background = background;
+        this.type = background ? ItemType.BACKGROUND : ItemType.SPRITE;
         setAsset(asset);
     }
 
-    public static ViewBoxItem createSprite(String id, AssetDefinition asset, int x, int y) {
+    private ViewBoxItem(String id, String text) {
+        this.id = id;
+        this.type = ItemType.LABEL;
+        setText(text);
+    }
+
+    public static ViewBoxItem createSprite(String id, AssetDefinition asset, double x, double y) {
         ViewBoxItem item = new ViewBoxItem(id, false, asset);
         item.move(x, y);
         return item;
@@ -43,6 +55,12 @@ public class ViewBoxItem {
 
     public static ViewBoxItem createBackground(String id, AssetDefinition asset) {
         return new ViewBoxItem(id, true, asset);
+    }
+
+    public static ViewBoxItem createLabel(String id, String text, double x, double y) {
+        ViewBoxItem item = new ViewBoxItem(id, text);
+        item.move(x, y);
+        return item;
     }
 
     public boolean isDirty() {
@@ -55,7 +73,7 @@ public class ViewBoxItem {
         assetDirty = false;
     }
 
-    public void move(int x, int y) {
+    public void move(double x, double y) {
         this.x = x;
         this.y = y;
         positionDirty = true;
@@ -71,28 +89,49 @@ public class ViewBoxItem {
         scaleDirty = true;
     }
 
-    public void setAsset(AssetDefinition asset) {
-        assetName = asset.name;
-        assetWidth = asset.width;
+    public void setAsset(AssetDefinition assetDefinition) {
+        asset = assetDefinition.name;
+        assetWidth = assetDefinition.width;
         assetDirty = true;
         applyScale();
     }
 
+    public void setText(String text) {
+        asset = text;
+        assetDirty = true;
+    }
+
     public void outputTo(UpdateViewBoxCommand command) {
-        if (background) {
-            if (assetDirty) {
-                command.addBackgroundItem(id, assetName);
-            }
-        } else if (positionDirty || scaleDirty) {
-            command.addSpriteItem(id, assetName, x, y, width);
+        switch (type) {
+            case BACKGROUND:
+                if (assetDirty) {
+                    command.addBackgroundItem(id, asset);
+                }
+                break;
+            case SPRITE:
+                if (positionDirty || scaleDirty) {
+                    command.addSpriteItem(id, asset, x, y, width);
+                }
+                break;
+            case LABEL:
+                if (positionDirty || assetDirty) {
+                    command.addLabelItem(id, asset, x, y);
+                }
+                break;
         }
     }
 
     public void outputTo(ShowViewBoxCommand command) {
-        if (background) {
-            command.addBackgroundItem(id, assetName);
-        } else {
-            command.addSpriteItem(id, assetName, x, y, width);
+        switch (type) {
+            case BACKGROUND:
+                command.addBackgroundItem(id, asset);
+                break;
+            case SPRITE:
+                command.addSpriteItem(id, asset, x, y, width);
+                break;
+            case LABEL:
+                command.addLabelItem(id, asset, x, y);
+                break;
         }
     }
 
