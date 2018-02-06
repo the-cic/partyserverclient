@@ -26,8 +26,8 @@ public abstract class SimpleRoomOwnerDelegate extends RoomOwnerDelegate {
     protected final Guests guests;
     private String roomName = null;
 
-    public SimpleRoomOwnerDelegate(String host, String name, String token) {
-        super(name, token);
+    public SimpleRoomOwnerDelegate(String host, String name, String token, String preferredRoom) {
+        super(name, token, preferredRoom);
         logger = LogManager.getLogger(this.getClass());
 
         URI hostUri = null;

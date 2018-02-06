@@ -31,14 +31,15 @@ import java.nio.file.Paths;
  */
 public class ExampleDelegate extends SimpleRoomOwnerDelegate {
 
-    private final static String NAME = "ExampleOwner";
-    private final static String TOKEN = "405784574057349";
+    private final static String NAME = "test";
+    private final static String TOKEN = "123456789012345";
+    private final static String ROOM = "TEST";
 
     private final AssetLibrary assets;
     private final ViewBox viewBox;
 
     public ExampleDelegate(String host) {
-        super(host, NAME, TOKEN);
+        super(host, NAME, TOKEN, ROOM);
         assets = new AssetLibrary();
         viewBox = new ViewBox();
 

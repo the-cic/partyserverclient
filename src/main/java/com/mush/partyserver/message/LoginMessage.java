@@ -14,4 +14,6 @@ public class LoginMessage extends Message {
     public String login;
 
     public String token;
+
+    public String room;
 }
